@@ -217,4 +217,13 @@ const case128: Case = [rect1, rect9, connectionPoint1111, connectionPoint9999];
 
 export const cases19 = [case113, case114, case115, case116, case117, case118, case119, case120, case121, case122, case123, case124, case125, case126, case127, case128];
 
-export const cases = [...cases19]
+export const cases = [
+    ...cases12,
+    ...cases13,
+    ...cases14,
+    ...cases15,
+    ...cases16,
+    ...cases17,
+    ...cases18,
+    ...cases19
+]
