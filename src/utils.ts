@@ -133,6 +133,10 @@ const build90To90 = (rect1: Rect, rect2: Rect, cPoint1: ConnectionPoint,cPoint2:
     path = [cPoint1.point, offsetPoint1, ...added, offsetPoint2, cPoint2.point];
   } else if (rect1.position.y === rect2.position.y) {
     path = [cPoint1.point, offsetPoint1, offsetPoint2, cPoint2.point];
+  } else if (rect1.position.x < rect2.position.x && rect1.position.y > rect2.position.y) {
+    const addX = find1PointConnectOffset2X(offsetPoint1, offsetPoint2);
+
+    path = [cPoint1.point, offsetPoint1, addX, offsetPoint2, cPoint2.point];
   } else if (rect1.position.y < rect2.position.y) {
     const addX = find1PointConnectOffset2Y(offsetPoint1, offsetPoint2);
 
@@ -192,8 +196,15 @@ const build90To270 = (rect1: Rect, rect2: Rect, cPoint1: ConnectionPoint,cPoint2
   return path;
 }
 
-const build90To180 = (cPoint1: ConnectionPoint,cPoint2: ConnectionPoint, offsetPoint1: Point, offsetPoint2: Point): Point[] => {
-  const path: Point[] = [cPoint1.point, offsetPoint1, { x: offsetPoint2.x, y: offsetPoint1.y }, offsetPoint2, cPoint2.point];
+const build90To180 = (rect1: Rect, rect2: Rect, cPoint1: ConnectionPoint,cPoint2: ConnectionPoint, offsetPoint1: Point, offsetPoint2: Point): Point[] => {
+  let path: Point[];
+  if(rect1.position.x < rect2.position.x && rect1.position.y > rect2.position.y) {
+    const addX = find1PointConnectOffset2X(offsetPoint1, offsetPoint2);
+
+    path = [cPoint1.point, offsetPoint1, addX, offsetPoint2, cPoint2.point];
+  } else {
+    path = [cPoint1.point, offsetPoint1, { x: offsetPoint2.x, y: offsetPoint1.y }, offsetPoint2, cPoint2.point];
+  }
 
   return path;
 }
@@ -210,7 +221,7 @@ const build0To90 = (rect1: Rect, rect2: Rect, cPoint1: ConnectionPoint,cPoint2: 
     } else if (rect1.position.x >= rect2.position.x && rect1.position.y < rect2.position.y) {
       addPoint = maxXmaxY(offsetPoint1, offsetPoint2);
     } else if (rect1.position.x < rect2.position.x && rect1.position.y < rect2.position.y) {
-      addPoint = minXmaxY(offsetPoint1, offsetPoint2);
+      addPoint = maxXminY(offsetPoint1, offsetPoint2);
     }
 
     path = [cPoint1.point, offsetPoint1, addPoint, offsetPoint2, cPoint2.point];
@@ -239,8 +250,16 @@ const build0To0 = (rect1: Rect, rect2: Rect, cPoint1: ConnectionPoint,cPoint2: C
     return path;
 }
 
-const build0To270 = (cPoint1: ConnectionPoint,cPoint2: ConnectionPoint, offsetPoint1: Point, offsetPoint2: Point): Point[] => {
-  const path: Point[] = [cPoint1.point, offsetPoint1, { x: offsetPoint1.x, y: offsetPoint2.y }, offsetPoint2, cPoint2.point];
+const build0To270 = (rect1: Rect, rect2: Rect,cPoint1: ConnectionPoint,cPoint2: ConnectionPoint, offsetPoint1: Point, offsetPoint2: Point): Point[] => {
+  let path: Point[];
+
+  if(rect1.position.x < rect2.position.x && rect1.position.y > rect2.position.y) {
+    const addX = find1PointConnectOffset2Y(offsetPoint1, offsetPoint2);
+
+    path = [cPoint1.point, offsetPoint1, addX, offsetPoint2, cPoint2.point];
+  } else {
+    path = [cPoint1.point, offsetPoint1, { x: offsetPoint1.x, y: offsetPoint2.y }, offsetPoint2, cPoint2.point];
+  }
 
   return path;
 }
@@ -276,7 +295,7 @@ const build270To90 = (rect1: Rect, rect2: Rect, cPoint1: ConnectionPoint,cPoint2
     const added = find2PointsOnLineX(rect1, rect2, cPoint1, offsetPoint1, offsetPoint2)
 
     path = [cPoint1.point, offsetPoint1, ...added, offsetPoint2, cPoint2.point];
-  } else if (rect1.position.y > rect2.position.y) {
+  } else if (rect1.position.y >= rect2.position.y) {
     const added = find2PointsInTheMiddleX(cPoint1, cPoint2, offsetPoint1, offsetPoint2);
 
     path = [cPoint1.point, offsetPoint1, ...added, offsetPoint2, cPoint2.point];
@@ -342,8 +361,15 @@ const build270To180 = (rect1: Rect, rect2: Rect, cPoint1: ConnectionPoint,cPoint
   return path;
 }
 
-const build180To90 = (cPoint1: ConnectionPoint,cPoint2: ConnectionPoint, offsetPoint1: Point, offsetPoint2: Point): Point[] => {
-  const path: Point[] = [cPoint1.point, offsetPoint1, { x: offsetPoint1.x, y: offsetPoint2.y }, offsetPoint2, cPoint2.point];
+const build180To90 = (rect1: Rect, rect2: Rect, cPoint1: ConnectionPoint,cPoint2: ConnectionPoint, offsetPoint1: Point, offsetPoint2: Point): Point[] => {
+  let path: Point[];
+  if (rect1.position.x > rect2.position.x && rect1.position.y < rect2.position.y) {
+    const addX = find1PointConnectOffset2Y(offsetPoint1, offsetPoint2);
+
+    path = [cPoint1.point, offsetPoint1, addX, offsetPoint2, cPoint2.point];
+  } else {
+    path = [cPoint1.point, offsetPoint1, { x: offsetPoint1.x, y: offsetPoint2.y }, offsetPoint2, cPoint2.point];
+  }
 
   return path;
 }
@@ -438,7 +464,7 @@ export function buildPath(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect, cP
   }
 
   if (cPoint1.angle === 90 && cPoint2.angle === 180) {
-    return build90To180(cPoint1, cPoint2, offsetPoint1, offsetPoint2);
+    return build90To180(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
   }
 
   if (cPoint1.angle === 0 && cPoint2.angle === 90) {
@@ -450,7 +476,7 @@ export function buildPath(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect, cP
   }
 
   if (cPoint1.angle === 0 && cPoint2.angle === 270) {
-    return build0To270(cPoint1, cPoint2, offsetPoint1, offsetPoint2);
+    return build0To270(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
   }
 
   if (cPoint1.angle === 0 && cPoint2.angle === 180) {
@@ -474,7 +500,7 @@ export function buildPath(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect, cP
   }
 
   if (cPoint1.angle === 180 && cPoint2.angle === 90) {
-    return build180To90(cPoint1, cPoint2, offsetPoint1, offsetPoint2);
+    return build180To90(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
   }
 
   if (cPoint1.angle === 180 && cPoint2.angle === 0) {
