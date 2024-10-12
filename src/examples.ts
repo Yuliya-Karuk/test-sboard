@@ -1,6 +1,6 @@
 import { ConnectionPoint, Rect } from "./utils";
 
-type Case = [Rect, Rect, ConnectionPoint, ConnectionPoint];
+export type Case = [Rect, Rect, ConnectionPoint, ConnectionPoint];
 
 const rect1: Rect = { position: { x: 400, y: 400 }, size: { width: 100, height: 100 } };
 const rect2: Rect = { position: { x: 100, y: 100 }, size: { width: 100, height: 100 } };

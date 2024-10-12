@@ -18,6 +18,8 @@ export type ConnectionPoint = {
   angle: number;
 };
 
+const offset = 5;
+
 export function checkConnectionPoint(rect: Rect, cPoint: ConnectionPoint): boolean {
   const { position, size } = rect;
   const halfWidth = size.width / 2;
@@ -30,27 +32,82 @@ export function checkConnectionPoint(rect: Rect, cPoint: ConnectionPoint): boole
 
   const point = cPoint.point;
 
-  if (point.y === topEdgeY && point.x >= leftEdgeX && point.x <= rightEdgeX) {
+  if (point.y === topEdgeY) {
     return cPoint.angle === 90;
   }
 
-  if (point.y === bottomEdgeY && point.x >= leftEdgeX && point.x <= rightEdgeX) {
+  if (point.y === bottomEdgeY) {
     return cPoint.angle === 270;
   }
 
-  if (point.x === leftEdgeX && point.y >= topEdgeY && point.y <= bottomEdgeY) {
+  if (point.x === leftEdgeX) {
     return cPoint.angle === 180;
   }
 
-  if (point.x === rightEdgeX && point.y >= topEdgeY && point.y <= bottomEdgeY) {
+  if (point.x === rightEdgeX) {
     return cPoint.angle === 0;
   }
 
   return false;
 }
 
+function calculateBounds(rect: Rect) {
+  const halfWidth = rect.size.width / 2;
+  const halfHeight = rect.size.height / 2;
 
-const offset = 10;
+  return {
+    left: rect.position.x - halfWidth,
+    right: rect.position.x + halfWidth,
+    top: rect.position.y - halfHeight,
+    bottom: rect.position.y + halfHeight
+  };
+}
+
+function checkRectOverlap(rect1: Rect, rect2: Rect): boolean | Error {
+  const moreThanOffset = 6;
+  const bounds1 = calculateBounds(rect1);
+  const bounds2 = calculateBounds(rect2);
+
+  const isOverlapping = !(bounds1.right < bounds2.left ||
+                          bounds1.left > bounds2.right ||
+                          bounds1.bottom < bounds2.top ||
+                          bounds1.top > bounds2.bottom);
+
+  if (isOverlapping) {
+    throw new Error("Прямоугольники перекрываются");
+  }
+
+  const expandedRect1 = {
+    position: rect1.position,
+    size: {
+      width: rect1.size.width + moreThanOffset,
+      height: rect1.size.height + moreThanOffset
+    }
+  };
+
+  const expandedRect2 = {
+    position: rect2.position,
+    size: {
+      width: rect2.size.width + moreThanOffset,
+      height: rect2.size.height + moreThanOffset,
+    }
+  };
+
+  const expandedBounds1 = calculateBounds(expandedRect1);
+  const expandedBounds2 = calculateBounds(expandedRect2);
+
+  const isTooClose = !(expandedBounds1.right < expandedBounds2.left ||
+                       expandedBounds1.left > expandedBounds2.right ||
+                       expandedBounds1.bottom < expandedBounds2.top ||
+                       expandedBounds1.top > expandedBounds2.bottom);
+
+
+  if (isTooClose) {
+    throw new Error("Прямоугольники находятся слишком близко (<= 10px)");
+  }
+
+  return true;
+}
 
 function offsetPoint(point: Point, angle: number, offset: number): Point {
   let offsetPoint = { ...point };
@@ -92,6 +149,14 @@ const find2PointsOnLineX = (rect1: Rect, rect2: Rect, cPoint1: ConnectionPoint, 
   return [{ x: addX, y: offsetPoint1.y }, { x: addX, y: offsetPoint2.y }]
 }
 
+const find2PointsToUp = (rect1: Rect, rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const rect1X = rect1.position.x + rect1.size.width / 2;
+  const rect2X = rect2.position.x + rect2.size.width / 2;
+
+  const addX = rect1X > rect2X ? rect1X + offset : rect2X + offset
+  return [{ x: addX, y: offsetPoint1.y }, { x: addX, y: offsetPoint2.y }]
+}
+
 const find1PointConnectOffset2X = (offsetPoint1: Point, offsetPoint2: Point) => {
   const add = { x: offsetPoint1.x, y: offsetPoint2.y }
 
@@ -107,20 +172,20 @@ const find1PointConnectOffset2Y = (offsetPoint1: Point, offsetPoint2: Point) => 
 const build90To90 = (rect1: Rect, rect2: Rect, cPoint1: ConnectionPoint, cPoint2: ConnectionPoint, offsetPoint1: Point, offsetPoint2: Point): Point[] => {
   let path: Point[];
 
-  if (rect1.position.x === rect2.position.x) {
+  if (cPoint1.point.x === cPoint2.point.x) {
     const added = find2PointsOnLineX(rect1, rect2, cPoint1, offsetPoint1, offsetPoint2)
 
     path = [cPoint1.point, offsetPoint1, ...added, offsetPoint2, cPoint2.point];
-  } else if (rect1.position.y === rect2.position.y) {
+  } else if (cPoint1.point.y === cPoint2.point.y) {
     path = [cPoint1.point, offsetPoint1, offsetPoint2, cPoint2.point];
-  } else if (rect1.position.y < rect2.position.y) {
+  } else if (cPoint1.point.y < cPoint2.point.y) {
     const addX = find1PointConnectOffset2Y(offsetPoint1, offsetPoint2);
 
     path = [cPoint1.point, offsetPoint1, addX, offsetPoint2, cPoint2.point];
   } else {
-    const addX = find1PointConnectOffset2X(offsetPoint1, offsetPoint2);
+    const added = find2PointsToUp(rect1, rect2, offsetPoint1, offsetPoint2)
 
-    path = [cPoint1.point, offsetPoint1, addX, offsetPoint2, cPoint2.point];
+    path = [cPoint1.point, offsetPoint1, ...added, offsetPoint2, cPoint2.point];
   }
 
   return path;
@@ -434,6 +499,10 @@ export function buildPath(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect, cP
 
   if (!checkConnectionPoint(rect2, cPoint2)) {
     throw new Error('ConnectionPoint2 не перпендикулярно и наружу относительно rect2');
+  }
+
+  if (!checkRectOverlap(rect1, rect2)) {
+    throw new Error("Прямоугольники находятся слишком близко (менее или равно 10px) или Прямоугольники перекрываются");
   }
 
   const offsetPoint1 = offsetPoint(cPoint1.point, cPoint1.angle, offset);

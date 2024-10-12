@@ -165,52 +165,63 @@
 // const rect8: Rect = { position: { x: 400, y: 700 }, size: { width: 100, height: 100 } };
 // const rect9: Rect = { position: { x: 700, y: 700 }, size: { width: 100, height: 100 } };
 
-// Connection points для верхней грани каждого прямоугольника
-// const connectionPoint1: ConnectionPoint = { point: { x: 400, y: 350 }, angle: 90 };
-// const connectionPoint1: ConnectionPoint = { point: { x: 450, y: 400 }, angle: 0 };
-// const connectionPoint1: ConnectionPoint = { point: { x: 400, y: 450 }, angle: 270 };
-// const connectionPoint1: ConnectionPoint = { point: { x: 350, y: 400 }, angle: 180 };
+const rect1: Rect = { position: { x: 400, y: 400 }, size: { width: 100, height: 100 } };
+
+const rect2: Rect = { position: { x: 100, y: 100 }, size: { width: 120, height: 80 } };
+const rect3: Rect = { position: { x: 400, y: 100 }, size: { width: 130, height: 70 } };
+const rect4: Rect = { position: { x: 700, y: 100 }, size: { width: 140, height: 60 } }; // Широкий прямоугольник
+const rect5: Rect = { position: { x: 100, y: 400 }, size: { width: 100, height: 120 } };
+const rect6: Rect = { position: { x: 700, y: 400 }, size: { width: 100, height: 130 } };
+const rect7: Rect = { position: { x: 100, y: 700 }, size: { width: 120, height: 80 } };
+const rect8: Rect = { position: { x: 400, y: 700 }, size: { width: 130, height: 70 } };
+const rect9: Rect = { position: { x: 700, y: 700 }, size: { width: 140, height: 60 } };
+
+Connection points для верхней грани каждого прямоугольника
+const connectionPoint1: ConnectionPoint = { point: { x: 400, y: 350 }, angle: 90 };
+const connectionPoint1: ConnectionPoint = { point: { x: 450, y: 400 }, angle: 0 };
+const connectionPoint1: ConnectionPoint = { point: { x: 400, y: 450 }, angle: 270 };
+const connectionPoint1: ConnectionPoint = { point: { x: 350, y: 400 }, angle: 180 };
 
 
-// вверх
-// const connectionPoint2: ConnectionPoint = { point: { x: 100, y: 50 }, angle: 90 };
-// const connectionPoint3: ConnectionPoint = { point: { x: 400, y: 50 }, angle: 90 };
-// const connectionPoint4: ConnectionPoint = { point: { x: 700, y: 50 }, angle: 90 };
-// const connectionPoint5: ConnectionPoint = { point: { x: 100, y: 350 }, angle: 90 };
-// const connectionPoint6: ConnectionPoint = { point: { x: 700, y: 350 }, angle: 90 };
-// const connectionPoint7: ConnectionPoint = { point: { x: 100, y: 650 }, angle: 90 };
-// const connectionPoint8: ConnectionPoint = { point: { x: 400, y: 650 }, angle: 90 };
-// const connectionPoint9: ConnectionPoint = { point: { x: 700, y: 650 }, angle: 90 };
+вверх
+const connectionPoint2: ConnectionPoint = { point: { x: 100, y: 50 }, angle: 90 };
+const connectionPoint3: ConnectionPoint = { point: { x: 400, y: 50 }, angle: 90 };
+const connectionPoint4: ConnectionPoint = { point: { x: 700, y: 50 }, angle: 90 };
+const connectionPoint5: ConnectionPoint = { point: { x: 100, y: 350 }, angle: 90 };
+const connectionPoint6: ConnectionPoint = { point: { x: 700, y: 350 }, angle: 90 };
+const connectionPoint7: ConnectionPoint = { point: { x: 100, y: 650 }, angle: 90 };
+const connectionPoint8: ConnectionPoint = { point: { x: 400, y: 650 }, angle: 90 };
+const connectionPoint9: ConnectionPoint = { point: { x: 700, y: 650 }, angle: 90 };
 
-//вправо
-// const connectionPoint2: ConnectionPoint = { point: { x: 150, y: 100 }, angle: 0 };
-// const connectionPoint3: ConnectionPoint = { point: { x: 450, y: 100 }, angle: 0 };
-// const connectionPoint4: ConnectionPoint = { point: { x: 750, y: 100 }, angle: 0 };
-// const connectionPoint5: ConnectionPoint = { point: { x: 150, y: 400 }, angle: 0 };
-// const connectionPoint6: ConnectionPoint = { point: { x: 750, y: 400 }, angle: 0 };
-// const connectionPoint7: ConnectionPoint = { point: { x: 150, y: 700 }, angle: 0 };
-// const connectionPoint8: ConnectionPoint = { point: { x: 450, y: 700 }, angle: 0 };
-// const connectionPoint9: ConnectionPoint = { point: { x: 750, y: 700 }, angle: 0 };
-
-
-// const connectionPoint2: ConnectionPoint = { point: { x: 100, y: 150 }, angle: 270 };
-// const connectionPoint3: ConnectionPoint = { point: { x: 400, y: 150 }, angle: 270 };
-// const connectionPoint4: ConnectionPoint = { point: { x: 700, y: 150 }, angle: 270 };
-// const connectionPoint5: ConnectionPoint = { point: { x: 100, y: 450 }, angle: 270 };
-// const connectionPoint6: ConnectionPoint = { point: { x: 700, y: 450 }, angle: 270 };
-// const connectionPoint7: ConnectionPoint = { point: { x: 100, y: 750 }, angle: 270 };
-// const connectionPoint8: ConnectionPoint = { point: { x: 400, y: 750 }, angle: 270 };
-// const connectionPoint9: ConnectionPoint = { point: { x: 700, y: 750 }, angle: 270 };
+вправо
+const connectionPoint2: ConnectionPoint = { point: { x: 150, y: 100 }, angle: 0 };
+const connectionPoint3: ConnectionPoint = { point: { x: 450, y: 100 }, angle: 0 };
+const connectionPoint4: ConnectionPoint = { point: { x: 750, y: 100 }, angle: 0 };
+const connectionPoint5: ConnectionPoint = { point: { x: 150, y: 400 }, angle: 0 };
+const connectionPoint6: ConnectionPoint = { point: { x: 750, y: 400 }, angle: 0 };
+const connectionPoint7: ConnectionPoint = { point: { x: 150, y: 700 }, angle: 0 };
+const connectionPoint8: ConnectionPoint = { point: { x: 450, y: 700 }, angle: 0 };
+const connectionPoint9: ConnectionPoint = { point: { x: 750, y: 700 }, angle: 0 };
 
 
-// const connectionPoint2: ConnectionPoint = { point: { x: 50, y: 100 }, angle: 180 };
-// const connectionPoint3: ConnectionPoint = { point: { x: 350, y: 100 }, angle: 180 };
-// const connectionPoint4: ConnectionPoint = { point: { x: 650, y: 100 }, angle: 180 };
-// const connectionPoint5: ConnectionPoint = { point: { x: 50, y: 400 }, angle: 180 };
-// const connectionPoint6: ConnectionPoint = { point: { x: 650, y: 400 }, angle: 180 };
-// const connectionPoint7: ConnectionPoint = { point: { x: 50, y: 700 }, angle: 180 };
-// const connectionPoint8: ConnectionPoint = { point: { x: 350, y: 700 }, angle: 180 };
-// const connectionPoint9: ConnectionPoint = { point: { x: 650, y: 700 }, angle: 180 };
+const connectionPoint2: ConnectionPoint = { point: { x: 100, y: 150 }, angle: 270 };
+const connectionPoint3: ConnectionPoint = { point: { x: 400, y: 150 }, angle: 270 };
+const connectionPoint4: ConnectionPoint = { point: { x: 700, y: 150 }, angle: 270 };
+const connectionPoint5: ConnectionPoint = { point: { x: 100, y: 450 }, angle: 270 };
+const connectionPoint6: ConnectionPoint = { point: { x: 700, y: 450 }, angle: 270 };
+const connectionPoint7: ConnectionPoint = { point: { x: 100, y: 750 }, angle: 270 };
+const connectionPoint8: ConnectionPoint = { point: { x: 400, y: 750 }, angle: 270 };
+const connectionPoint9: ConnectionPoint = { point: { x: 700, y: 750 }, angle: 270 };
+
+
+const connectionPoint2: ConnectionPoint = { point: { x: 50, y: 100 }, angle: 180 };
+const connectionPoint3: ConnectionPoint = { point: { x: 350, y: 100 }, angle: 180 };
+const connectionPoint4: ConnectionPoint = { point: { x: 650, y: 100 }, angle: 180 };
+const connectionPoint5: ConnectionPoint = { point: { x: 50, y: 400 }, angle: 180 };
+const connectionPoint6: ConnectionPoint = { point: { x: 650, y: 400 }, angle: 180 };
+const connectionPoint7: ConnectionPoint = { point: { x: 50, y: 700 }, angle: 180 };
+const connectionPoint8: ConnectionPoint = { point: { x: 350, y: 700 }, angle: 180 };
+const connectionPoint9: ConnectionPoint = { point: { x: 650, y: 700 }, angle: 180 };
 
 // renderer.drawRect(rect1, 'blue'); // Отрисовка rect1
 // renderer.drawPoint(connectionPoint1.point); // Точка на rect1
