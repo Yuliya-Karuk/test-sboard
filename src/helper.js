@@ -13,18 +13,3 @@ function getRandomConnectionPoint(rect) {
   console.log(`const connectionPoint9: ConnectionPoint = ${JSON.stringify(p3)};`)
   console.log(`const connectionPoint9: ConnectionPoint = ${JSON.stringify(p4)};`)
 }
-
-// getRandomConnectionPoint({ position: { x: 300, y: 100 }, size: { width: 300, height: 80 } }) //2
-// getRandomConnectionPoint({ position: { x: 400, y: 100 }, size: { width: 60, height: 80 } }) //2
-
-// getRandomConnectionPoint({ position: { x: 400, y: 100 }, size: { width: 200, height: 80 } }) //3
-// getRandomConnectionPoint({ position: { x: 400, y: 100 }, size: { width: 60, height: 80 } }) //3
-
-// getRandomConnectionPoint({ position: { x: 320, y: 700 }, size: { width: 300, height: 80 } }) 7
-
-
-// getRandomConnectionPoint({ position: { x: 400, y: 700 }, size: { width: 200, height: 80 } }) //8
-
-getRandomConnectionPoint({ position: { x: 470, y: 700 }, size: { width: 300, height: 80 } }) //9
-
-
