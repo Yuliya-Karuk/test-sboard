@@ -69,9 +69,9 @@ function checkRectOverlap(rect1: Rect, rect2: Rect): boolean | Error {
   const bounds2 = calculateBounds(rect2);
 
   const isOverlapping = !(bounds1.right < bounds2.left ||
-                          bounds1.left > bounds2.right ||
-                          bounds1.bottom < bounds2.top ||
-                          bounds1.top > bounds2.bottom);
+    bounds1.left > bounds2.right ||
+    bounds1.bottom < bounds2.top ||
+    bounds1.top > bounds2.bottom);
 
   if (isOverlapping) {
     throw new Error("Прямоугольники перекрываются");
@@ -97,9 +97,9 @@ function checkRectOverlap(rect1: Rect, rect2: Rect): boolean | Error {
   const expandedBounds2 = calculateBounds(expandedRect2);
 
   const isTooClose = !(expandedBounds1.right < expandedBounds2.left ||
-                       expandedBounds1.left > expandedBounds2.right ||
-                       expandedBounds1.bottom < expandedBounds2.top ||
-                       expandedBounds1.top > expandedBounds2.bottom);
+    expandedBounds1.left > expandedBounds2.right ||
+    expandedBounds1.bottom < expandedBounds2.top ||
+    expandedBounds1.top > expandedBounds2.bottom);
 
 
   if (isTooClose) {
@@ -125,50 +125,180 @@ function offsetPoint(point: Point, angle: number, offset: number): Point {
   return offsetPoint;
 }
 
-const find2PointsInTheMiddleY = (cPoint1: ConnectionPoint, cPoint2: ConnectionPoint, offsetPoint1: Point, offsetPoint2: Point) => {
-  const addY = Math.abs((cPoint1.point.y - cPoint2.point.y) / 2) + (cPoint1.point.y > cPoint2.point.y ? cPoint2.point.y : cPoint1.point.y);
+const goAroundRect2 = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const leftEdge = rect2.position.x - rect2.size.width / 2;
+  const rightEdge = rect2.position.x + rect2.size.width / 2;
+
+  if (leftEdge <= offsetPoint1.x && offsetPoint1.x <= rightEdge) {
+    const diffToLeft = Math.abs(offsetPoint1.x - leftEdge);
+    const diffToRight = Math.abs(offsetPoint1.x - rightEdge);
+    const neededDiff = diffToLeft > diffToRight ? diffToRight + offset : -diffToLeft - offset;
+
+    console.log(diffToLeft, diffToRight);
+    const add1 = { x: offsetPoint1.x + neededDiff, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint1.x + neededDiff, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  const add1 = { x: offsetPoint1.x, y: offsetPoint2.y };
+  return [add1];
+}
+
+const findTheNearestEdgeByXAndGoAroundItBy2 = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const leftEdge = rect1.position.x - rect1.size.width / 2;
+  const rightEdge = rect1.position.x + rect1.size.width / 2;
+
+  if (leftEdge <= offsetPoint2.x && offsetPoint2.x <= rightEdge) {
+    return [{ x: rightEdge + offset, y: offsetPoint1.y }, { x: rightEdge + offset, y: offsetPoint2.y }];
+  }
+
+  const add1 = { x: offsetPoint2.x, y: offsetPoint1.y };;
+  return [add1];
+}
+
+const goFromLeftToTop = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const leftEdge = rect2.position.x - rect2.size.width / 2;
+  const rightEdge = rect2.position.x + rect2.size.width / 2;
+
+  if (leftEdge <= offsetPoint1.x && offsetPoint1.x <= rightEdge) {
+    const diffToLeft = Math.abs(offsetPoint1.x - leftEdge);
+    const neededDiff = -diffToLeft - offset;
+
+    const add1 = { x: offsetPoint1.x + neededDiff, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint1.x + neededDiff, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  const add1 = { x: offsetPoint1.x, y: offsetPoint2.y };
+  return [add1];
+}
+
+const goFromRightToTop = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const leftEdge = rect2.position.x - rect2.size.width / 2;
+  const rightEdge = rect2.position.x + rect2.size.width / 2;
+
+  if (leftEdge <= offsetPoint1.x && offsetPoint1.x <= rightEdge) {
+    const diffToRight = Math.abs(offsetPoint1.x - rightEdge);
+    const neededDiff = diffToRight + offset;
+
+    const add1 = { x: offsetPoint1.x + neededDiff, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint1.x + neededDiff, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  const add1 = { x: offsetPoint1.x, y: offsetPoint2.y };
+  return [add1];
+}
+
+const goAroundRight2 = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const leftEdge = rect1.position.x - rect1.size.width / 2;
+  const rightEdge = rect1.position.x + rect1.size.width / 2;
+
+  if (rightEdge > offsetPoint2.x && offsetPoint2.x > leftEdge) {
+    const add1 = { x: offsetPoint1.x - rect1.size.width / 2 - offset, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint1.x - rect1.size.width / 2 - offset, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  const add1 = { x: offsetPoint2.x, y: offsetPoint1.y };
+  return [add1];
+}
+
+const goAroundRect1ByY = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const leftEdge = rect1.position.x - rect1.size.width / 2;
+  const rightEdge = rect1.position.x + rect1.size.width / 2;
+
+  if (rightEdge > offsetPoint2.x && offsetPoint2.x > leftEdge) {
+    const add1 = { x: offsetPoint1.x - rect1.size.width / 2 - offset, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint1.x - rect1.size.width / 2 - offset, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  const add1 = { x: offsetPoint2.x, y: offsetPoint1.y };
+  return [add1];
+}
+
+function calculateSegmentLength(points: Point[]) {
+  let totalLength = 0;
+
+  for (let i = 0; i < points.length - 1; i++) {
+    let x1 = points[i].x;
+    let y1 = points[i].y;
+    let x2 = points[i + 1].x;
+    let y2 = points[i + 1].y;
+
+    let distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+    totalLength += distance;
+  }
+
+  return totalLength;
+}
+
+const goAroundTwoRect = (rect1: Rect, rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const leftEdgeRect1 = rect1.position.x - rect1.size.width / 2;
+  const rightEdgeRect1 = rect1.position.x + rect1.size.width / 2;
+
+  const leftEdgeRect2 = rect2.position.x - rect2.size.width / 2;
+  const rightEdgeRect2 = rect2.position.x + rect2.size.width / 2;
+
+  const mostLeft = leftEdgeRect1 > leftEdgeRect2 ? leftEdgeRect2 : leftEdgeRect1;
+  const mostRight = rightEdgeRect1 > rightEdgeRect2 ? rightEdgeRect1 : rightEdgeRect2
+  const leftPoints = [{ x: mostLeft - offset, y: offsetPoint1.y }, { x: mostLeft - offset, y: offsetPoint2.y }];
+  const rightPoints = [{ x: mostRight + offset, y: offsetPoint1.y }, { x: mostRight + offset, y: offsetPoint2.y }];
+
+  if (offsetPoint1.x === offsetPoint2.x) {
+    return rightPoints;
+  }
+
+  if (rightEdgeRect2 + offset < leftEdgeRect1 - offset) {
+    const add1 = { x: offsetPoint2.x + rect2.size.width / 2 + offset, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint2.x + rect2.size.width / 2 + offset, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  if (leftEdgeRect2 - offset > rightEdgeRect1 + offset) {
+    const add1 = { x: offsetPoint2.x - rect2.size.width / 2 - offset, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint2.x - rect2.size.width / 2 - offset, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  const leftPath = calculateSegmentLength([offsetPoint1, ...leftPoints, offsetPoint2]);
+  const rightPath = calculateSegmentLength([offsetPoint1, ...rightPoints, offsetPoint2])
+  return leftPath >= rightPath ? rightPoints :leftPoints;
+}
+
+const addPoint1XPoint2Y = (offsetPoint1: Point, offsetPoint2: Point) => {
+  return [{ x: offsetPoint1.x, y: offsetPoint2.y }];
+}
+
+const addPoint1YPoint2X = (offsetPoint1: Point, offsetPoint2: Point) => {
+  return [{ x: offsetPoint2.x, y: offsetPoint1.y }];
+}
+
+const find2PointsInTheMiddleY = (offsetPoint1: Point, offsetPoint2: Point) => {
+  const addY = Math.abs((offsetPoint1.y - offsetPoint2.y) / 2) + (offsetPoint1.y > offsetPoint2.y ? offsetPoint2.y : offsetPoint1.y);
 
   return [{ x: offsetPoint1.x, y: addY }, { x: offsetPoint2.x, y: addY }]
 }
 
-const find2PointsInTheMiddleX = (cPoint1: ConnectionPoint, cPoint2: ConnectionPoint, offsetPoint1: Point, offsetPoint2: Point) => {
-  const addX = Math.abs((cPoint1.point.x - cPoint2.point.x) / 2) + (cPoint1.point.x > cPoint2.point.x ? cPoint2.point.x : cPoint1.point.x);
+const goAroundRect1 = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const leftEdge = rect1.position.x - rect1.size.width / 2;
+  const rightEdge = rect1.position.x + rect1.size.width / 2;
 
-  return [{ x: addX, y: offsetPoint1.y }, { x: addX, y: offsetPoint2.y }];
+  if (rightEdge > offsetPoint2.x && offsetPoint2.x > leftEdge) {
+    const diffToLeft = Math.abs(offsetPoint2.x - leftEdge);
+    const diffToRight = Math.abs(offsetPoint2.x - rightEdge);
+    const neededDiff = diffToLeft > diffToRight ? diffToRight + offset : -diffToLeft - offset;
+
+    console.log(diffToLeft, diffToRight);
+    const add1 = { x: offsetPoint1.x + neededDiff, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint1.x + neededDiff, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  const add1 = { x: offsetPoint2.x, y: offsetPoint1.y };
+  return [add1];
 }
-
-const find2PointsOnLineY = (rect1: Rect, rect2: Rect, cPoint1: ConnectionPoint, offsetPoint1: Point, offsetPoint2: Point) => {
-  const addY = cPoint1.point.y + (rect1.size.height > rect2.size.height ? rect1.size.height / 2 + offset : rect2.size.height / 2 + offset);
-
-  return [{ x: offsetPoint1.x, y: addY }, { x: offsetPoint2.x, y: addY }]
-}
-
-const find2PointsOnLineX = (rect1: Rect, rect2: Rect, cPoint1: ConnectionPoint, offsetPoint1: Point, offsetPoint2: Point) => {
-  const addX = cPoint1.point.x + (rect1.size.width > rect2.size.width ? rect1.size.width / 2 + offset : rect2.size.width / 2 + offset);
-
-  return [{ x: addX, y: offsetPoint1.y }, { x: addX, y: offsetPoint2.y }]
-}
-
-const find2PointsToUp = (rect1: Rect, rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
-  const rect1X = rect1.position.x + rect1.size.width / 2;
-  const rect2X = rect2.position.x + rect2.size.width / 2;
-
-  const addX = rect1X > rect2X ? rect1X + offset : rect2X + offset
-  return [{ x: addX, y: offsetPoint1.y }, { x: addX, y: offsetPoint2.y }]
-}
-
-const find1PointConnectOffset2X = (offsetPoint1: Point, offsetPoint2: Point) => {
-  const add = { x: offsetPoint1.x, y: offsetPoint2.y }
-
-  return add;
-}
-
-const find1PointConnectOffset2Y = (offsetPoint1: Point, offsetPoint2: Point) => {
-  const add = { x: offsetPoint2.x, y: offsetPoint1.y }
-
-  return add;
-}
-
 
 export function buildPath(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect, cPoint2: ConnectionPoint): Point[] {
   if (!checkConnectionPoint(rect1, cPoint1)) {
@@ -186,117 +316,322 @@ export function buildPath(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect, cP
   const offsetPoint1 = offsetPoint(cPoint1.point, cPoint1.angle, offset);
   const offsetPoint2 = offsetPoint(cPoint2.point, cPoint2.angle, offset);
 
-  // 4 cases
-  if (cPoint1.point.x === cPoint2.point.x && ((cPoint1.angle === 90 && cPoint2.angle === 270) || (cPoint1.angle === 270 && cPoint2.angle === 90))) {
+  if (cPoint1.point.x === cPoint2.point.x && ((cPoint1.angle === 90 && cPoint2.angle === 270 && cPoint1.point.y > cPoint2.point.y) || (cPoint1.angle === 270 && cPoint2.angle === 90 && cPoint1.point.y < cPoint2.point.y))) {
+    console.log('1-2');
     return [cPoint1.point, offsetPoint1, offsetPoint2, cPoint2.point];
   }
 
-  // 4 cases
-  console.log(offsetPoint1.x, offsetPoint2.x)
-  if (offsetPoint1.x > offsetPoint2.x &&
-    (cPoint1.angle === 180 && (cPoint2.angle === 270 || cPoint2.angle === 90))) {
-    const add =  { x: offsetPoint2.x, y: offsetPoint1.y };
-    return [cPoint1.point, offsetPoint1, add,offsetPoint2, cPoint2.point];
-  }
+  if (rect1.position.y - rect1.size.height / 2 - offset > rect2.position.y + rect2.size.height / 2 + offset) {
+    if (cPoint1.angle === 180 && cPoint2.angle === 270) {
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
 
-  if (offsetPoint1.x < offsetPoint2.x &&
-    (cPoint1.angle === 0 && (cPoint2.angle === 270 || cPoint2.angle === 90))) {
-    const add =  { x: offsetPoint2.x, y: offsetPoint1.y };
-    return [cPoint1.point, offsetPoint1, add,offsetPoint2, cPoint2.point];
-  }
+    if (cPoint1.angle === 180 && cPoint2.angle === 90) {
+      const add = goFromLeftToTop(rect2, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
 
-  if (offsetPoint1.x > offsetPoint2.x && ((cPoint1.angle === 90 && cPoint2.angle === 270) || (cPoint1.angle === 270 && cPoint2.angle === 90))) {
-    return [cPoint1.point, offsetPoint1, offsetPoint2, cPoint2.point];
-  }
+    if (cPoint1.angle === 180 && cPoint2.angle === 0) {
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      } else {
+        add = find2PointsInTheMiddleY(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
 
+    if (cPoint1.angle === 180 && cPoint2.angle === 180) {
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
 
-  if (cPoint1.point.x === cPoint2.point.x && ((cPoint1.angle === 0 || cPoint1.angle === 180) && (cPoint2.angle === 270 || cPoint2.angle === 90))) {
-    console.log('sjjsj')
-    const added = { x: offsetPoint2.x, y: offsetPoint1.y };
-    return [cPoint1.point, offsetPoint1, added, offsetPoint2, cPoint2.point];
-  }
+    if (cPoint1.angle === 90 && cPoint2.angle === 90) {
+      console.log('9');
+      const add = goAroundRect2(rect2, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
 
-  if (cPoint1.point.x === cPoint2.point.x && ((cPoint1.angle === 90 && cPoint2.angle === 90) || (cPoint1.angle === 270 && cPoint2.angle === 270))) {
-    if (rect1.size.width < rect2.size.width) {
-      const rect1X = { x: rect1.position.x + rect1.size.width / 2 + offset, y: offsetPoint1.y };
-      const rect2X = { x: rect2.position.x + rect2.size.width / 2 + offset, y: offsetPoint2.y };
-      // console.log(rect1X, rect2X);
-    
-  
-      const add = { x: rect1X.x > rect2X.x ? rect1X.x : rect2X.x, y: rect1X.x > rect2X.x ? offsetPoint2.y : offsetPoint1.y };
-      console.log(add);
-      return [cPoint1.point, offsetPoint1, rect1X, add, rect2X, offsetPoint2, cPoint2.point];
-    } else {
-      const rect1X = { x: rect1.position.x + rect1.size.width / 2 + offset, y: offsetPoint1.y };
-      const rect2X = { x: rect2.position.x + rect2.size.width / 2 + offset, y: offsetPoint2.y };
-      // console.log(rect1X, rect2X);
-    
-  
-      const add = { x: rect1X.x > rect2X.x ? rect1X.x : rect2X.x, y: rect1X.x > rect2X.x ? offsetPoint2.y : offsetPoint1.y };
-      console.log(add);
-      return [cPoint1.point, offsetPoint1, rect1X, add, rect2X, offsetPoint2, cPoint2.point];
+    if (cPoint1.angle === 90 && cPoint2.angle === 180) {
+      console.log('10');
+
+      let add;
+      if (offsetPoint1.x <= offsetPoint2.x) {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 90 && cPoint2.angle === 0) {
+      console.log('11');
+
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 90 && cPoint2.angle === 270) {
+      console.log('12');
+      const add = addPoint1YPoint2X(offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 270 && cPoint2.angle === 0) {
+      console.log('13');
+      const add = findTheNearestEdgeByXAndGoAroundItBy2(rect1, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 270 && cPoint2.angle === 180) {
+      console.log('14');
+      const add = goAroundRight2(rect1, offsetPoint1, offsetPoint2);
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 270 && cPoint2.angle === 270) {
+      console.log('15');
+      const add = goAroundRect1(rect1, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 270 && cPoint2.angle === 90) {
+      console.log('16');
+      const add = goAroundTwoRect(rect1, rect2, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 0 && cPoint2.angle === 90) {
+      const add = goFromRightToTop(rect2, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 0 && cPoint2.angle === 270) {
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 0 && cPoint2.angle === 0) {
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add =  addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 0 && cPoint2.angle === 180) {
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = find2PointsInTheMiddleY(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
   }
 
-  if (cPoint1.angle === 90 && cPoint2.angle === 0) {
-    return build90To0(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
+  if (rect1.position.y + rect1.size.height / 2 + offset < rect2.position.y - rect2.size.height / 2 - offset) {
+    if (cPoint1.angle === 180 && cPoint2.angle === 90) {
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 180 && cPoint2.angle === 270) {
+      const add = goFromLeftToTop(rect2, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 180 && cPoint2.angle === 0) {
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      } else {
+        add = find2PointsInTheMiddleY(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 180 && cPoint2.angle === 180) {
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 90 && cPoint2.angle === 90) {
+      console.log('15');
+      const add = goAroundRect1(rect1, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 90 && cPoint2.angle === 180) {
+      console.log('14');
+      const add = goAroundRight2(rect1, offsetPoint1, offsetPoint2);
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 90 && cPoint2.angle === 270) {
+      console.log('16');
+      const add = goAroundTwoRect(rect1, rect2, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 0 && cPoint2.angle === 0) {
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 0 && cPoint2.angle === 90) {
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 0 && cPoint2.angle === 270) {
+      const add = goFromRightToTop(rect2, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 0 && cPoint2.angle === 180) {
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = find2PointsInTheMiddleY(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 270 && cPoint2.angle === 180) {
+      let add;
+      if (offsetPoint1.x <= offsetPoint2.x) {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 270 && cPoint2.angle === 270) {
+      console.log('9');
+      const add = goAroundRect2(rect2, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 270 && cPoint2.angle === 90) {
+      console.log('12');
+      const add = addPoint1YPoint2X(offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 270 && cPoint2.angle === 0) {
+      console.log('11');
+
+      let add;
+      if (offsetPoint1.x >= offsetPoint2.x) {
+        add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
+      } else {
+        add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      }
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
   }
 
-  if (cPoint1.angle === 90 && cPoint2.angle === 270) {
-    return build90To270(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
 
-  if (cPoint1.angle === 90 && cPoint2.angle === 180) {
-    return build90To180(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
+  if (cPoint1.point.x > cPoint2.point.x) {
+    console.log('hshh')
+    if (cPoint1.angle === 90 && cPoint2.angle === 0) {
+      const add = goFromRightToTop(rect2, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
   }
+  // if (offsetPoint1.x < offsetPoint2.x && offsetPoint1.y > offsetPoint2.y &&
+  //   cPoint1.angle === 0 && cPoint2.angle === 270) {
+  //   console.log('7');
+  //   const add = { x: offsetPoint2.x, y: offsetPoint1.y };
+  //   return [cPoint1.point, offsetPoint1, add, offsetPoint2, cPoint2.point];
+  // }
 
-  if (cPoint1.angle === 0 && cPoint2.angle === 90) {
-    return build0To90(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
+  // if (offsetPoint1.x < offsetPoint2.x && offsetPoint1.y < offsetPoint2.y &&
+  //   cPoint1.angle === 0 && cPoint2.angle === 90) {
+  //   console.log('8');
+  //   const add = { x: offsetPoint2.x, y: offsetPoint1.y };
+  //   return [cPoint1.point, offsetPoint1, add, offsetPoint2, cPoint2.point];
+  // }
 
-  if (cPoint1.angle === 0 && cPoint2.angle === 0) {
-    return build0To0(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
 
-  if (cPoint1.angle === 0 && cPoint2.angle === 270) {
-    return build0To270(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
+  // if (offsetPoint1.x > offsetPoint2.x && ((cPoint1.angle === 90 && cPoint2.angle === 270) || (cPoint1.angle === 270 && cPoint2.angle === 90))) {
+  //   return [cPoint1.point, offsetPoint1, offsetPoint2, cPoint2.point];
+  // }
 
-  if (cPoint1.angle === 0 && cPoint2.angle === 180) {
-    return build0To180(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
 
-  if (cPoint1.angle === 270 && cPoint2.angle === 90) {
-    return build270To90(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
+  // if (cPoint1.point.x === cPoint2.point.x && ((cPoint1.angle === 0 || cPoint1.angle === 180) && (cPoint2.angle === 270 || cPoint2.angle === 90))) {
+  //   console.log('sjjsj')
+  //   const added = { x: offsetPoint2.x, y: offsetPoint1.y };
+  //   return [cPoint1.point, offsetPoint1, added, offsetPoint2, cPoint2.point];
+  // }
 
-  if (cPoint1.angle === 270 && cPoint2.angle === 0) {
-    return build270To0(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
+  // if (cPoint1.point.x === cPoint2.point.x && ((cPoint1.angle === 90 && cPoint2.angle === 90) || (cPoint1.angle === 270 && cPoint2.angle === 270))) {
+  //   if (rect1.size.width < rect2.size.width) {
+  //     const rect1X = { x: rect1.position.x + rect1.size.width / 2 + offset, y: offsetPoint1.y };
+  //     const rect2X = { x: rect2.position.x + rect2.size.width / 2 + offset, y: offsetPoint2.y };
+  //     // console.log(rect1X, rect2X);
 
-  if (cPoint1.angle === 270 && cPoint2.angle === 270) {
-    return build270To270(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
 
-  if (cPoint1.angle === 270 && cPoint2.angle === 180) {
-    return build270To180(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
+  //     const add = { x: rect1X.x > rect2X.x ? rect1X.x : rect2X.x, y: rect1X.x > rect2X.x ? offsetPoint2.y : offsetPoint1.y };
+  //     return [cPoint1.point, offsetPoint1, rect1X, add, rect2X, offsetPoint2, cPoint2.point];
+  //   } else {
+  //     const rect1X = { x: rect1.position.x + rect1.size.width / 2 + offset, y: offsetPoint1.y };
+  //     const rect2X = { x: rect2.position.x + rect2.size.width / 2 + offset, y: offsetPoint2.y };
+  //     // console.log(rect1X, rect2X);
 
-  if (cPoint1.angle === 180 && cPoint2.angle === 90) {
-    return build180To90(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
 
-  if (cPoint1.angle === 180 && cPoint2.angle === 0) {
-    return build180To0(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
+  //     const add = { x: rect1X.x > rect2X.x ? rect1X.x : rect2X.x, y: rect1X.x > rect2X.x ? offsetPoint2.y : offsetPoint1.y };
+  //     return [cPoint1.point, offsetPoint1, rect1X, add, rect2X, offsetPoint2, cPoint2.point];
+  //   }
+  // }
 
-  if (cPoint1.angle === 180 && cPoint2.angle === 270) {
-    return build180To270(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
-
-  if (cPoint1.angle === 180 && cPoint2.angle === 180) {
-    return build180To180(rect1, rect2, cPoint1, cPoint2, offsetPoint1, offsetPoint2);
-  }
-
+  
   throw new Error('Случай соединения не учтен');
 }
+

@@ -67,19 +67,19 @@ randomButton.addEventListener('click', () => {
 
 
 const rect1: Rect = { position: { x: 400, y: 400 }, size: { width: 100, height: 100 } };
-// const connectionPoint1: ConnectionPoint = { point: { x: 400, y: 350 }, angle: 90 };
-const connectionPoint1: ConnectionPoint = { point: { x: 450, y: 400 }, angle: 0 };
+const connectionPoint1: ConnectionPoint = { point: { x: 400, y: 350 }, angle: 90 };
+// const connectionPoint1: ConnectionPoint = { point: { x: 450, y: 400 }, angle: 0 };
 // const connectionPoint1: ConnectionPoint = { point: { x: 400, y: 450 }, angle: 270 };
 // const connectionPoint1: ConnectionPoint = { point: { x: 350, y: 400 }, angle: 180 };
 renderer.drawRect(rect1, 'blue'); // Отрисовка rect1
 renderer.drawPoint(connectionPoint1.point); // Точка на rect1
 
 // rect2
-// const rect2: Rect = { position: { x: 300, y: 100 }, size: { width: 300, height: 80 } };
-// const connectionPoint3: ConnectionPoint = {"point":{"x":300,"y":60},"angle":90};
-// const connectionPoint3: ConnectionPoint = {"point":{"x":450,"y":100},"angle":0};
-// const connectionPoint2: ConnectionPoint = {"point":{"x":300,"y":140},"angle":270};
-// const connectionPoint3: ConnectionPoint = {"point":{"x":150,"y":100},"angle":180};
+const rect2: Rect = { position: { x: 200, y: 500 }, size: { width: 100, height: 300 } };
+// const connectionPoint2: ConnectionPoint = {"point":{"x":500,"y":560},"angle":90};
+const connectionPoint2: ConnectionPoint = {"point":{"x":250,"y":500},"angle":0};
+// const connectionPoint2: ConnectionPoint = {"point":{"x":250,"y":640},"angle":270};
+// const connectionPoint2: ConnectionPoint = {"point":{"x":600,"y":600},"angle":180};
 
 // const rect2: Rect = { position: { x: 100, y: 100 }, size: { width: 100, height: 100 } };
 // const connectionPoint2: ConnectionPoint = { point: { x: 100, y: 50 }, angle: 90 };
@@ -87,10 +87,10 @@ renderer.drawPoint(connectionPoint1.point); // Точка на rect1
 // const connectionPoint2: ConnectionPoint = { point: { x: 100, y: 150 }, angle: 270 };
 // const connectionPoint2: ConnectionPoint = { point: { x: 50, y: 100 }, angle: 180 };
 
-// renderer.drawPoint(connectionPoint2.point); // Точка на rect2
-// renderer.drawRect(rect2, 'green'); // Отрисовка rect2
-// const path1to2 = buildPath(rect1, connectionPoint1, rect2, connectionPoint2);
-// renderer.drawLine(path1to2, 'red');
+renderer.drawPoint(connectionPoint2.point); // Точка на rect2
+renderer.drawRect(rect2, 'green'); // Отрисовка rect2
+const path1to2 = buildPath(rect1, connectionPoint1, rect2, connectionPoint2);
+renderer.drawLine(path1to2, 'red');
 
 
 // rect3
@@ -107,10 +107,10 @@ const connectionPoint3: ConnectionPoint = {"point":{"x":400,"y":140},"angle":270
 // const connectionPoint3: ConnectionPoint = { point: { x: 400, y: 150 }, angle: 270 };
 // const connectionPoint3: ConnectionPoint = { point: { x: 350, y: 100 }, angle: 180 };
 
-renderer.drawPoint(connectionPoint3.point); // Точка на rect3
-renderer.drawRect(rect3, 'green'); // Отрисовка rect3
-const path1to3 = buildPath(rect1, connectionPoint1, rect3, connectionPoint3);
-renderer.drawLine(path1to3, 'red');
+// renderer.drawPoint(connectionPoint3.point); // Точка на rect3
+// renderer.drawRect(rect3, 'green'); // Отрисовка rect3
+// const path1to3 = buildPath(rect1, connectionPoint1, rect3, connectionPoint3);
+// renderer.drawLine(path1to3, 'red');
 
 
 // rect4
@@ -214,7 +214,7 @@ const connectionPoint9: ConnectionPoint = {"point":{"x":470,"y":660},"angle":90}
 // const connectionPoint9: ConnectionPoint = { point: { x: 700, y: 750 }, angle: 270 };
 // const connectionPoint9: ConnectionPoint = { point: { x: 650, y: 700 }, angle: 180 };
 
-renderer.drawPoint(connectionPoint9.point); // Точка на rect9
-renderer.drawRect(rect9, 'green'); // Отрисовка rect9
-const path1to9 = buildPath(rect1, connectionPoint1, rect9, connectionPoint9);
-renderer.drawLine(path1to9, 'red');
+// renderer.drawPoint(connectionPoint9.point); // Точка на rect9
+// renderer.drawRect(rect9, 'green'); // Отрисовка rect9
+// const path1to9 = buildPath(rect1, connectionPoint1, rect9, connectionPoint9);
+// renderer.drawLine(path1to9, 'red');
