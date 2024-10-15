@@ -655,8 +655,6 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
   }
 
-
-
   if (cPoint1.point.x < cPoint2.point.x) {
     if (cPoint1.angle === 270 && cPoint2.angle === 0) {
       add = goAroundRect2ByYBottom(rect2, offsetPoint1, offsetPoint2)

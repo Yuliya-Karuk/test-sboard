@@ -121,12 +121,12 @@ showMockedButton.addEventListener('click', () => {
   if (!isShowRandom) {
     startRandom();
     isShowRandom = true;
-    showMockedButton.textContent = 'Stop Mocked Data';
+    showMockedButton.textContent = 'Удалить моковые прямоугольники';
   } else {
     stopRandom();
     isShowRandom = false;
     renderer.clear();
-    showMockedButton.textContent = 'Show Mocked Data';
+    showMockedButton.textContent = 'Показать моковые прямоугольники';
   }
 });
 
