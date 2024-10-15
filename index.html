@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,8 +7,216 @@
     <title>Vite + TS</title>
   </head>
   <body>
-    <canvas id="canvas" width="800" height="800"></canvas>
+    <canvas id="canvas" width="800" height="780"></canvas>
+    <div class="buttons">
+      <button class="btn" id="random">Создать рандомные прямоугольники</button>
+      <button class="btn" id="enter">Ввести данные прямоугльников</button>
+      <button class="btn" id="mocked">Показать моковые прямоугльники</button>
+    </div>
+    <div class="modal">
+      <div class="modal-content">
+        <h3 class="modal-title">Ввести данные прямоугльников</h3>
+        <form class="modal-form"  novalidate method autocomplete="on" action="">
+          <ul class="modal-inputs">
+            <li class="modal-item">
+              <label class="modal-label" for="positionX-rect1"
+                >Координата центра X 1 прямоугольника</label
+              >
+              <input
+                class="modal-input"
+                id="positionX-rect1"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+            <li class="modal-item">
+              <label class="modal-label" for="positionX-rect2"
+                >Координата центра X 2 прямоугольника</label
+              >
+              <input
+                class="modal-input"
+                id="positionX-rect2"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+            <li class="modal-item">
+              <label class="modal-label" for="positionY-rect1"
+                >Координата центра Y 1 прямоугольника</label
+              >
+              <input
+                class="modal-input"
+                id="positionY-rect1"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+            <li class="modal-item">
+              <label class="modal-label" for="positionY-rect2"
+                >Координата центра  Y2 прямоугольника</label
+              >
+              <input
+                class="modal-input"
+                id="positionY-rect2"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
 
+            <li class="modal-item">
+              <label class="modal-label" for="width-rect1"
+                >Длина 1 прямоугольника</label
+              >
+              <input
+                class="modal-input"
+                id="width-rect1"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+            <li class="modal-item">
+              <label class="modal-label" for="width-rect2"
+                >Длина 2 прямоугольника</label
+              >
+              <input
+                class="modal-input"
+                id="width-rect2"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+
+            <li class="modal-item">
+              <label class="modal-label" for="height-rect1"
+                >Ширина 1 прямоугольника</label
+              >
+              <input
+                class="modal-input"
+                id="height-rect1"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+
+            <li class="modal-item">
+              <label class="modal-label" for="height-rect2"
+                >Ширина 2 прямоугольника</label
+              >
+              <input
+                class="modal-input"
+                id="height-rect2"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+
+            <li class="modal-item">
+              <label class="modal-label" for="x-point1"
+                >Координата X 1 точки</label
+              >
+              <input
+                class="modal-input"
+                id="x-point1"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+
+            <li class="modal-item">
+              <label class="modal-label" for="x-point2"
+                >Координата X 2 точки</label
+              >
+              <input
+                class="modal-input"
+                id="x-point2"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+
+            <li class="modal-item">
+              <label class="modal-label" for="y-point1"
+                >Координата Y 1 точки</label
+              >
+              <input
+                class="modal-input"
+                id="y-point1"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+
+            <li class="modal-item">
+              <label class="modal-label" for="y-point2"
+                >Координата Y 2 точки</label
+              >
+              <input
+                class="modal-input"
+                id="y-point2"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+
+            <li class="modal-item">
+              <label class="modal-label" for="angle-point1"
+                >Угол 1 точки</label
+              >
+              <input
+                class="modal-input"
+                id="angle-point1"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+
+            <li class="modal-item">
+              <label class="modal-label" for="angle-point2"
+                >Угол 2 точки</label
+              >
+              <input
+                class="modal-input"
+                id="angle-point2"
+                type="text"
+                pattern="\d*"
+                name="first-name"
+                required
+              />
+            </li>
+          </ul>
+          <button class="btn modal-button" type="submit">Нарисовать</button>
+        </form>
+        <button class="modal-close-btn" type="button">
+          <span class="modal-close-icon"></span>
+        </button>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
