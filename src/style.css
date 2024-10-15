@@ -1,3 +1,11 @@
+* {
+  box-sizing: border-box;
+}
+
+.html {
+  font-size: 10px;
+}
+
 body {
   display: flex;
   justify-content: center;
@@ -5,6 +13,13 @@ body {
   height: 100vh;
   margin: 0;
   background-color: #f4f4f4;
+  font-size: 1rem;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 canvas {
@@ -32,4 +47,93 @@ canvas {
 
 .btn:hover {
   opacity: 0.7;
+}
+
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(41, 41, 41, .6);
+}
+
+.modal-content {
+  position: relative;
+  z-index: 30;
+  padding: 20px 25px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+  width: 600px;
+  background-color: white;
+  overflow: scroll;
+}
+
+.modal-active {
+  display: flex
+}
+
+.modal-title {
+  text-align: center;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.modal-label {
+  display: block;
+  margin-bottom: 10px;
+  /* @include font("Inter", 1.5rem, 400, 2rem, 0.03rem); */
+}
+
+.modal-input {
+  width: 100%;
+  height: 30px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  border: 2px solid #c7625d;
+  border-radius: 5px;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.modal-input:hover {
+  box-shadow: 0px 0px 2px 1px rgba(41, 41, 41, 0.3);
+}
+
+.modal-button {
+  margin: 0 auto;
+  margin-bottom: 10px;
+}
+
+.modal-close-btn {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.modal-close-icon {
+  display: block;
+  width: 15px;
+  height: 15px;
+  background: center no-repeat url("../public/close_btn_black.svg");
 }
