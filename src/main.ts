@@ -1,9 +1,9 @@
 import './style.css'
-import { dataConverter } from "./utils.ts";
-import { cases } from './examples.ts';
+import { dataConverter } from "./dataConverter.ts";
+import { cases } from './utils/examples.ts';
 import { Renderer } from './renderer.ts';
-import { createRandomRectAndPoints } from './randomUtils.ts';
-import { Rect, ConnectionPoint } from './types.ts';
+import { createRandomRectAndPoints } from './utils/randomUtils.ts';
+import { Rect, ConnectionPoint } from './utils/types.ts';
 
 let isShowRandom = false;
 let intervalId: number | null = null;
@@ -135,30 +135,3 @@ randomButton.addEventListener('click', () => {
   const randomData = createRandomRectAndPoints();
   draw(...randomData);
 });
-
-
-const rect1: Rect = { position: { x: 317.5, y: 184.5 }, size: { width: 259, height: 63 } };
-const connectionPoint1: ConnectionPoint = { point: { x: 317.5, y: 153 }, angle: 90 };
-// const connectionPoint1: ConnectionPoint = { point: { x: 450, y: 400 }, angle: 0 };
-// const connectionPoint1: ConnectionPoint = { point: { x: 400, y: 450 }, angle: 270 };
-// const connectionPoint1: ConnectionPoint = { point: { x: 350, y: 400 }, angle: 180 };
-renderer.drawRect(rect1, 'blue'); // Отрисовка rect1
-renderer.drawPoint(connectionPoint1.point); // Точка на rect1
-
-// rect2
-const rect2: Rect = { position: { x: 193.5, y: 295.5 }, size: { width: 259, height: 89 } };
-const connectionPoint2: ConnectionPoint = {"point":{"x":193.5,"y":251},"angle":90};
-// const connectionPoint2: ConnectionPoint = {"point":{"x":250,"y":500},"angle":0};
-// const connectionPoint2: ConnectionPoint = {"point":{"x":250,"y":640},"angle":270};
-// const connectionPoint2: ConnectionPoint = {"point":{"x":600,"y":600},"angle":180};
-
-// const rect2: Rect = { position: { x: 100, y: 100 }, size: { width: 100, height: 100 } };
-// const connectionPoint2: ConnectionPoint = { point: { x: 100, y: 50 }, angle: 90 };
-// const connectionPoint2: ConnectionPoint = { point: { x: 150, y: 100 }, angle: 0 };
-// const connectionPoint2: ConnectionPoint = { point: { x: 100, y: 150 }, angle: 270 };
-// const connectionPoint2: ConnectionPoint = { point: { x: 50, y: 100 }, angle: 180 };
-
-renderer.drawPoint(connectionPoint2.point); // Точка на rect2
-renderer.drawRect(rect2, 'green'); // Отрисовка rect2
-const path1to2 = dataConverter(rect1, connectionPoint1, rect2, connectionPoint2);
-renderer.drawLine(path1to2, 'red');

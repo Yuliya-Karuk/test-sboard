@@ -1,97 +1,8 @@
-import { ConnectionPoint, Point, Rect } from "./types";
+import { checkConnectionPoint, checkRectOverlap } from "./utils/checkers";
+import { ConnectionPoint, Point, Rect } from "./utils/types";
+import { calculateSegmentLength } from "./utils/utils";
 
 const offset = 5;
-
-export function checkConnectionPoint(rect: Rect, cPoint: ConnectionPoint): boolean {
-  const { position, size } = rect;
-  const halfWidth = size.width / 2;
-  const halfHeight = size.height / 2;
-
-  const topEdgeY = position.y - halfHeight;
-  const bottomEdgeY = position.y + halfHeight;
-  const leftEdgeX = position.x - halfWidth;
-  const rightEdgeX = position.x + halfWidth;
-
-  const point = cPoint.point;
-
-  if (point.y === topEdgeY) {
-    return cPoint.angle === 90;
-  }
-
-  if (point.y === bottomEdgeY) {
-    return cPoint.angle === 270;
-  }
-
-  if (point.x === leftEdgeX) {
-    return cPoint.angle === 180;
-  }
-
-  if (point.x === rightEdgeX) {
-    return cPoint.angle === 0;
-  }
-
-  return false;
-}
-
-function calculateBounds(rect: Rect) {
-  const halfWidth = rect.size.width / 2;
-  const halfHeight = rect.size.height / 2;
-
-  return {
-    left: rect.position.x - halfWidth,
-    right: rect.position.x + halfWidth,
-    top: rect.position.y - halfHeight,
-    bottom: rect.position.y + halfHeight
-  };
-}
-
-function checkRectOverlap(rect1: Rect, rect2: Rect): boolean | Error {
-  const moreThanOffset = 6;
-  const bounds1 = calculateBounds(rect1);
-  const bounds2 = calculateBounds(rect2);
-
-  const isOverlapping = !(bounds1.right < bounds2.left ||
-    bounds1.left > bounds2.right ||
-    bounds1.bottom < bounds2.top ||
-    bounds1.top > bounds2.bottom);
-
-  if (isOverlapping) {
-    alert("Прямоугольники перекрываются");
-    throw new Error("Прямоугольники перекрываются");
-  }
-
-  const expandedRect1 = {
-    position: rect1.position,
-    size: {
-      width: rect1.size.width + moreThanOffset,
-      height: rect1.size.height + moreThanOffset
-    }
-  };
-
-  const expandedRect2 = {
-    position: rect2.position,
-    size: {
-      width: rect2.size.width + moreThanOffset,
-      height: rect2.size.height + moreThanOffset,
-    }
-  };
-
-  const expandedBounds1 = calculateBounds(expandedRect1);
-  const expandedBounds2 = calculateBounds(expandedRect2);
-
-  const isTooClose = !(expandedBounds1.right < expandedBounds2.left ||
-    expandedBounds1.left > expandedBounds2.right ||
-    expandedBounds1.bottom < expandedBounds2.top ||
-    expandedBounds1.top > expandedBounds2.bottom);
-
-
-  if (isTooClose) {
-    alert("Прямоугольники находятся слишком близко (<= 10px)")
-    throw new Error("Прямоугольники находятся слишком близко (<= 10px)");
-  }
-
-  return true;
-}
 
 function offsetPoint(point: Point, angle: number, offset: number): Point {
   let offsetPoint = { ...point };
@@ -107,6 +18,81 @@ function offsetPoint(point: Point, angle: number, offset: number): Point {
   }
 
   return offsetPoint;
+}
+
+const addPoint1XPoint2Y = (offsetPoint1: Point, offsetPoint2: Point) => {
+  return [{ x: offsetPoint1.x, y: offsetPoint2.y }];
+}
+
+const addPoint1YPoint2X = (offsetPoint1: Point, offsetPoint2: Point) => {
+  return [{ x: offsetPoint2.x, y: offsetPoint1.y }];
+}
+
+const find2PointsInTheMiddleY = (offsetPoint1: Point, offsetPoint2: Point) => {
+  const addY = Math.abs((offsetPoint1.y - offsetPoint2.y) / 2) + (offsetPoint1.y > offsetPoint2.y ? offsetPoint2.y : offsetPoint1.y);
+
+  return [{ x: offsetPoint1.x, y: addY }, { x: offsetPoint2.x, y: addY }]
+}
+
+const find2PointsInTheMiddleX = (offsetPoint1: Point, offsetPoint2: Point) => {
+  const addX = Math.abs((offsetPoint1.x - offsetPoint2.x) / 2) + (offsetPoint1.x > offsetPoint2.x ? offsetPoint2.x : offsetPoint1.x);
+
+  return [{ x: addX, y: offsetPoint1.y }, { x: addX, y: offsetPoint2.y }];
+}
+
+
+const goAroundTwoRect = (rect1: Rect, rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const leftEdgeRect1 = rect1.position.x - rect1.size.width / 2;
+  const rightEdgeRect1 = rect1.position.x + rect1.size.width / 2;
+
+  const leftEdgeRect2 = rect2.position.x - rect2.size.width / 2;
+  const rightEdgeRect2 = rect2.position.x + rect2.size.width / 2;
+
+  const mostLeft = leftEdgeRect1 > leftEdgeRect2 ? leftEdgeRect2 : leftEdgeRect1;
+  const mostRight = rightEdgeRect1 > rightEdgeRect2 ? rightEdgeRect1 : rightEdgeRect2
+  const leftPoints = [{ x: mostLeft - offset, y: offsetPoint1.y }, { x: mostLeft - offset, y: offsetPoint2.y }];
+  const rightPoints = [{ x: mostRight + offset, y: offsetPoint1.y }, { x: mostRight + offset, y: offsetPoint2.y }];
+
+  if (offsetPoint1.x === offsetPoint2.x) {
+    return rightPoints;
+  }
+
+  if (rightEdgeRect2 + offset < leftEdgeRect1 - offset) {
+    const add1 = { x: offsetPoint2.x + rect2.size.width / 2 + offset, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint2.x + rect2.size.width / 2 + offset, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  if (leftEdgeRect2 - offset > rightEdgeRect1 + offset) {
+    const add1 = { x: offsetPoint2.x - rect2.size.width / 2 - offset, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint2.x - rect2.size.width / 2 - offset, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  const leftPath = calculateSegmentLength([offsetPoint1, ...leftPoints, offsetPoint2]);
+  const rightPath = calculateSegmentLength([offsetPoint1, ...rightPoints, offsetPoint2])
+  return leftPath >= rightPath ? rightPoints : leftPoints;
+}
+
+const goAroundTwoRectY = (rect1: Rect, rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const topEdgeRect1 = rect1.position.y - rect1.size.height / 2;
+  const bottomEdgeRect1 = rect1.position.y + rect1.size.height / 2;
+
+  const topEdgeRect2 = rect2.position.y - rect2.size.height / 2;
+  const bottomEdgeRect2 = rect2.position.y + rect2.size.height / 2;
+
+  const mostTop = topEdgeRect1 > topEdgeRect2 ? topEdgeRect2 : topEdgeRect1;
+  const mostBottom = bottomEdgeRect1 > bottomEdgeRect2 ? bottomEdgeRect1 : bottomEdgeRect2;
+  const topPoints = [{ x: offsetPoint1.x, y: mostTop - offset }, { x: offsetPoint2.x, y: mostTop - offset }];
+  const bottomPoints = [{ x: offsetPoint1.x, y: mostBottom + offset }, { x: offsetPoint2.x, y: mostBottom + offset }];
+
+  if (offsetPoint1.x === offsetPoint2.x) {
+    return bottomPoints;
+  }
+
+  const topPath = calculateSegmentLength([offsetPoint1, ...topPoints, offsetPoint2]);
+  const bottomPath = calculateSegmentLength([offsetPoint1, ...bottomPoints, offsetPoint2])
+  return topPath >= bottomPath ? bottomPoints : topPoints;
 }
 
 const goAroundRect2 = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
@@ -257,96 +243,6 @@ const goFromBottomToLeft = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Poin
 
   const add1 = { x: offsetPoint2.x, y: offsetPoint1.y };
   return [add1];
-}
-
-function calculateSegmentLength(points: Point[]) {
-  let totalLength = 0;
-
-  for (let i = 0; i < points.length - 1; i++) {
-    let x1 = points[i].x;
-    let y1 = points[i].y;
-    let x2 = points[i + 1].x;
-    let y2 = points[i + 1].y;
-
-    let distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-    totalLength += distance;
-  }
-
-  return totalLength;
-}
-
-const goAroundTwoRect = (rect1: Rect, rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
-  const leftEdgeRect1 = rect1.position.x - rect1.size.width / 2;
-  const rightEdgeRect1 = rect1.position.x + rect1.size.width / 2;
-
-  const leftEdgeRect2 = rect2.position.x - rect2.size.width / 2;
-  const rightEdgeRect2 = rect2.position.x + rect2.size.width / 2;
-
-  const mostLeft = leftEdgeRect1 > leftEdgeRect2 ? leftEdgeRect2 : leftEdgeRect1;
-  const mostRight = rightEdgeRect1 > rightEdgeRect2 ? rightEdgeRect1 : rightEdgeRect2
-  const leftPoints = [{ x: mostLeft - offset, y: offsetPoint1.y }, { x: mostLeft - offset, y: offsetPoint2.y }];
-  const rightPoints = [{ x: mostRight + offset, y: offsetPoint1.y }, { x: mostRight + offset, y: offsetPoint2.y }];
-
-  if (offsetPoint1.x === offsetPoint2.x) {
-    return rightPoints;
-  }
-
-  if (rightEdgeRect2 + offset < leftEdgeRect1 - offset) {
-    const add1 = { x: offsetPoint2.x + rect2.size.width / 2 + offset, y: offsetPoint1.y };
-    const add2 = { x: offsetPoint2.x + rect2.size.width / 2 + offset, y: offsetPoint2.y };
-    return [add1, add2];
-  }
-
-  if (leftEdgeRect2 - offset > rightEdgeRect1 + offset) {
-    const add1 = { x: offsetPoint2.x - rect2.size.width / 2 - offset, y: offsetPoint1.y };
-    const add2 = { x: offsetPoint2.x - rect2.size.width / 2 - offset, y: offsetPoint2.y };
-    return [add1, add2];
-  }
-
-  const leftPath = calculateSegmentLength([offsetPoint1, ...leftPoints, offsetPoint2]);
-  const rightPath = calculateSegmentLength([offsetPoint1, ...rightPoints, offsetPoint2])
-  return leftPath >= rightPath ? rightPoints : leftPoints;
-}
-
-const goAroundTwoRectY = (rect1: Rect, rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
-  const topEdgeRect1 = rect1.position.y - rect1.size.height / 2;
-  const bottomEdgeRect1 = rect1.position.y + rect1.size.height / 2;
-
-  const topEdgeRect2 = rect2.position.y - rect2.size.height / 2;
-  const bottomEdgeRect2 = rect2.position.y + rect2.size.height / 2;
-
-  const mostTop = topEdgeRect1 > topEdgeRect2 ? topEdgeRect2 : topEdgeRect1;
-  const mostBottom = bottomEdgeRect1 > bottomEdgeRect2 ? bottomEdgeRect1 : bottomEdgeRect2;
-  const topPoints = [{ x: offsetPoint1.x, y: mostTop - offset }, { x: offsetPoint2.x, y: mostTop - offset }];
-  const bottomPoints = [{ x: offsetPoint1.x, y: mostBottom + offset }, { x: offsetPoint2.x, y: mostBottom + offset }];
-
-  if (offsetPoint1.x === offsetPoint2.x) {
-    return bottomPoints;
-  }
-
-  const topPath = calculateSegmentLength([offsetPoint1, ...topPoints, offsetPoint2]);
-  const bottomPath = calculateSegmentLength([offsetPoint1, ...bottomPoints, offsetPoint2])
-  return topPath >= bottomPath ? bottomPoints : topPoints;
-}
-
-const addPoint1XPoint2Y = (offsetPoint1: Point, offsetPoint2: Point) => {
-  return [{ x: offsetPoint1.x, y: offsetPoint2.y }];
-}
-
-const addPoint1YPoint2X = (offsetPoint1: Point, offsetPoint2: Point) => {
-  return [{ x: offsetPoint2.x, y: offsetPoint1.y }];
-}
-
-const find2PointsInTheMiddleY = (offsetPoint1: Point, offsetPoint2: Point) => {
-  const addY = Math.abs((offsetPoint1.y - offsetPoint2.y) / 2) + (offsetPoint1.y > offsetPoint2.y ? offsetPoint2.y : offsetPoint1.y);
-
-  return [{ x: offsetPoint1.x, y: addY }, { x: offsetPoint2.x, y: addY }]
-}
-
-const find2PointsInTheMiddleX = (offsetPoint1: Point, offsetPoint2: Point) => {
-  const addX = Math.abs((offsetPoint1.x - offsetPoint2.x) / 2) + (offsetPoint1.x > offsetPoint2.x ? offsetPoint2.x : offsetPoint1.x);
-
-  return [{ x: addX, y: offsetPoint1.y }, { x: addX, y: offsetPoint2.y }];
 }
 
 const goAroundRect1X = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
@@ -822,4 +718,3 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
   alert('Случай соединения не учтен')
   throw new Error('Случай соединения не учтен');
 }
-

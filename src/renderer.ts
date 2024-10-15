@@ -1,5 +1,5 @@
 
-import { Point, Rect } from "./types";
+import { Point, Rect } from "./utils/types";
 
 export class Renderer {
   private canvas: HTMLCanvasElement;
