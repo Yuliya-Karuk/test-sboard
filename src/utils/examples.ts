@@ -16,7 +16,6 @@ const connectionPoint111: ConnectionPoint = { point: { x: 400, y: 450 }, angle: 
 const connectionPoint1111: ConnectionPoint = { point: { x: 350, y: 400 }, angle: 180 };
 
 
-
 const connectionPoint2: ConnectionPoint = { point: { x: 100, y: 50 }, angle: 90 };
 const connectionPoint3: ConnectionPoint = { point: { x: 400, y: 50 }, angle: 90 };
 const connectionPoint4: ConnectionPoint = { point: { x: 700, y: 50 }, angle: 90 };

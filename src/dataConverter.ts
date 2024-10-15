@@ -28,20 +28,7 @@ const addPoint1YPoint2X = (offsetPoint1: Point, offsetPoint2: Point) => {
   return [{ x: offsetPoint2.x, y: offsetPoint1.y }];
 }
 
-const find2PointsInTheMiddleY = (offsetPoint1: Point, offsetPoint2: Point) => {
-  const addY = Math.abs((offsetPoint1.y - offsetPoint2.y) / 2) + (offsetPoint1.y > offsetPoint2.y ? offsetPoint2.y : offsetPoint1.y);
-
-  return [{ x: offsetPoint1.x, y: addY }, { x: offsetPoint2.x, y: addY }]
-}
-
-const find2PointsInTheMiddleX = (offsetPoint1: Point, offsetPoint2: Point) => {
-  const addX = Math.abs((offsetPoint1.x - offsetPoint2.x) / 2) + (offsetPoint1.x > offsetPoint2.x ? offsetPoint2.x : offsetPoint1.x);
-
-  return [{ x: addX, y: offsetPoint1.y }, { x: addX, y: offsetPoint2.y }];
-}
-
-
-const goAroundTwoRect = (rect1: Rect, rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+const goAroundTwoRectX = (rect1: Rect, rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
   const leftEdgeRect1 = rect1.position.x - rect1.size.width / 2;
   const rightEdgeRect1 = rect1.position.x + rect1.size.width / 2;
 
@@ -95,7 +82,7 @@ const goAroundTwoRectY = (rect1: Rect, rect2: Rect, offsetPoint1: Point, offsetP
   return topPath >= bottomPath ? bottomPoints : topPoints;
 }
 
-const goAroundRect2 = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+const goAroundRect2ByX = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
   const leftEdge = rect2.position.x - rect2.size.width / 2;
   const rightEdge = rect2.position.x + rect2.size.width / 2;
 
@@ -113,7 +100,7 @@ const goAroundRect2 = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) =>
   return [add1];
 }
 
-const goAroundRect2Y = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+const goAroundRect2ByY = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
   const topEdge = rect2.position.y - rect2.size.height / 2;
   const bottomEdge = rect2.position.y + rect2.size.height / 2;
 
@@ -131,7 +118,43 @@ const goAroundRect2Y = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) =
   return [add1];
 }
 
-const goAroundRect2ByTop = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+const goAroundRect1ByX = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const leftEdge = rect1.position.x - rect1.size.width / 2;
+  const rightEdge = rect1.position.x + rect1.size.width / 2;
+
+  if (rightEdge > offsetPoint2.x && offsetPoint2.x > leftEdge) {
+    const diffToLeft = Math.abs(offsetPoint2.x - leftEdge);
+    const diffToRight = Math.abs(offsetPoint2.x - rightEdge);
+    const neededDiff = diffToLeft > diffToRight ? diffToRight + offset : -diffToLeft - offset;
+
+    const add1 = { x: offsetPoint2.x + neededDiff, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint2.x + neededDiff, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  const add1 = { x: offsetPoint2.x, y: offsetPoint1.y };
+  return [add1];
+}
+
+const goAroundRect1ByY = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const topEdge = rect1.position.y - rect1.size.height / 2;
+  const bottomEdge = rect1.position.y + rect1.size.height / 2;
+
+  if (topEdge - offset < offsetPoint2.y && offsetPoint2.y < bottomEdge + offset) {
+    const diffToTop = Math.abs(offsetPoint2.y - topEdge);
+    const diffToBottom = Math.abs(offsetPoint2.y - bottomEdge);
+    const neededDiff = diffToTop > diffToBottom ? diffToBottom + offset : -diffToTop - offset;
+
+    const add1 = { x: offsetPoint1.x, y: offsetPoint2.y + neededDiff };
+    const add2 = { x: offsetPoint2.x, y: offsetPoint2.y + neededDiff };
+    return [add1, add2];
+  }
+
+  const add1 = { x: offsetPoint1.x, y: offsetPoint2.y };
+  return [add1];
+}
+
+const goAroundRect2ByYTop = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
   const topEdge = rect2.position.y - rect2.size.height / 2;
 
   if (topEdge - offset < offsetPoint1.y) {
@@ -144,7 +167,7 @@ const goAroundRect2ByTop = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Poin
   return [add1];
 }
 
-const goAroundRect2ByBottom = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+const goAroundRect2ByYBottom = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
   const bottomEdge = rect2.position.y + rect2.size.height / 2;
 
   if (bottomEdge + offset > offsetPoint1.y) {
@@ -157,7 +180,37 @@ const goAroundRect2ByBottom = (rect2: Rect, offsetPoint1: Point, offsetPoint2: P
   return [add1];
 }
 
-const goFromBottomToRight = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+const findWayBetweenOppositeByX = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point, isBottom: boolean) => {
+  const bottomEdge = rect1.position.y + rect1.size.height / 2;
+  const topEdge = rect1.position.y - rect1.size.height / 2;
+
+  if (isBottom) {
+    const add1 = { x: offsetPoint1.x, y: bottomEdge + offset };
+    const add2 = { x: offsetPoint2.x, y: bottomEdge + offset };
+    return [add1, add2];
+  }
+
+  const add1 = { x: offsetPoint1.x, y: topEdge - offset };
+  const add2 = { x: offsetPoint2.x, y: topEdge - offset };
+  return [add1, add2];
+}
+
+const findWayBetweenOppositeByY = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point, isRight: boolean) => {
+  const rightEdge = rect1.position.x + rect1.size.width / 2;
+  const leftEdge = rect1.position.x - rect1.size.width / 2;
+
+  if (isRight) {
+    const add1 = { x: rightEdge + offset, y: offsetPoint1.y };
+    const add2 = { x: rightEdge + offset, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  const add1 = { x: leftEdge - offset, y: offsetPoint1.y };
+  const add2 = { x: leftEdge - offset, y: offsetPoint2.y };
+  return [add1, add2];
+}
+
+const goAroundRect1ByXFrom270to0 = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
   const leftEdge = rect1.position.x - rect1.size.width / 2;
   const rightEdge = rect1.position.x + rect1.size.width / 2;
 
@@ -186,6 +239,37 @@ const goFromLeftToTop = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) 
   return [add1];
 }
 
+const goFromRightToTop = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const leftEdge = rect2.position.x - rect2.size.width / 2;
+  const rightEdge = rect2.position.x + rect2.size.width / 2;
+
+  if (leftEdge <= offsetPoint1.x && offsetPoint1.x <= rightEdge) {
+    const diffToRight = Math.abs(offsetPoint1.x - rightEdge);
+    const neededDiff = diffToRight + offset;
+
+    const add1 = { x: offsetPoint1.x + neededDiff, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint1.x + neededDiff, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  const add1 = { x: offsetPoint1.x, y: offsetPoint2.y };
+  return [add1];
+}
+
+const goAroundRect1ByXFrom270to180 = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
+  const leftEdge = rect1.position.x - rect1.size.width / 2;
+  const rightEdge = rect1.position.x + rect1.size.width / 2;
+
+  if (rightEdge > offsetPoint2.x && offsetPoint2.x > leftEdge) {
+    const add1 = { x: offsetPoint1.x - rect1.size.width / 2 - offset, y: offsetPoint1.y };
+    const add2 = { x: offsetPoint1.x - rect1.size.width / 2 - offset, y: offsetPoint2.y };
+    return [add1, add2];
+  }
+
+  const add1 = { x: offsetPoint2.x, y: offsetPoint1.y };
+  return [add1];
+}
+
 const goFromRightToTopY = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
   const topEdge = rect1.position.y - rect1.size.height / 2;
   const bottomEdge = rect1.position.y + rect1.size.height / 2;
@@ -207,73 +291,6 @@ const goFromRightToBottomY = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Po
   if (topEdge <= offsetPoint2.y && offsetPoint2.y <= bottomEdge) {
     const add1 = { x: offsetPoint1.x, y: bottomEdge + offset };
     const add2 = { x: offsetPoint2.x, y: bottomEdge + offset };
-    return [add1, add2];
-  }
-
-  const add1 = { x: offsetPoint1.x, y: offsetPoint2.y };
-  return [add1];
-}
-
-const goFromRightToTop = (rect2: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
-  const leftEdge = rect2.position.x - rect2.size.width / 2;
-  const rightEdge = rect2.position.x + rect2.size.width / 2;
-
-  if (leftEdge <= offsetPoint1.x && offsetPoint1.x <= rightEdge) {
-    const diffToRight = Math.abs(offsetPoint1.x - rightEdge);
-    const neededDiff = diffToRight + offset;
-
-    const add1 = { x: offsetPoint1.x + neededDiff, y: offsetPoint1.y };
-    const add2 = { x: offsetPoint1.x + neededDiff, y: offsetPoint2.y };
-    return [add1, add2];
-  }
-
-  const add1 = { x: offsetPoint1.x, y: offsetPoint2.y };
-  return [add1];
-}
-
-const goFromBottomToLeft = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
-  const leftEdge = rect1.position.x - rect1.size.width / 2;
-  const rightEdge = rect1.position.x + rect1.size.width / 2;
-
-  if (rightEdge > offsetPoint2.x && offsetPoint2.x > leftEdge) {
-    const add1 = { x: offsetPoint1.x - rect1.size.width / 2 - offset, y: offsetPoint1.y };
-    const add2 = { x: offsetPoint1.x - rect1.size.width / 2 - offset, y: offsetPoint2.y };
-    return [add1, add2];
-  }
-
-  const add1 = { x: offsetPoint2.x, y: offsetPoint1.y };
-  return [add1];
-}
-
-const goAroundRect1X = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
-  const leftEdge = rect1.position.x - rect1.size.width / 2;
-  const rightEdge = rect1.position.x + rect1.size.width / 2;
-
-  if (rightEdge > offsetPoint2.x && offsetPoint2.x > leftEdge) {
-    const diffToLeft = Math.abs(offsetPoint2.x - leftEdge);
-    const diffToRight = Math.abs(offsetPoint2.x - rightEdge);
-    const neededDiff = diffToLeft > diffToRight ? diffToRight + offset : -diffToLeft - offset;
-
-    const add1 = { x: offsetPoint2.x + neededDiff, y: offsetPoint1.y };
-    const add2 = { x: offsetPoint2.x + neededDiff, y: offsetPoint2.y };
-    return [add1, add2];
-  }
-
-  const add1 = { x: offsetPoint2.x, y: offsetPoint1.y };
-  return [add1];
-}
-
-const goAroundRect1Y = (rect1: Rect, offsetPoint1: Point, offsetPoint2: Point) => {
-  const topEdge = rect1.position.y - rect1.size.height / 2;
-  const bottomEdge = rect1.position.y + rect1.size.height / 2;
-
-  if (topEdge - offset < offsetPoint2.y && offsetPoint2.y < bottomEdge + offset) {
-    const diffToTop = Math.abs(offsetPoint2.y - topEdge);
-    const diffToBottom = Math.abs(offsetPoint2.y - bottomEdge);
-    const neededDiff = diffToTop > diffToBottom ? diffToBottom + offset : -diffToTop - offset;
-
-    const add1 = { x: offsetPoint1.x, y: offsetPoint2.y + neededDiff };
-    const add2 = { x: offsetPoint2.x, y: offsetPoint2.y + neededDiff };
     return [add1, add2];
   }
 
@@ -322,7 +339,7 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
       if (offsetPoint1.x >= offsetPoint2.x) {
         add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
       } else {
-        add = find2PointsInTheMiddleY(offsetPoint1, offsetPoint2);
+        add = findWayBetweenOppositeByX(rect1, offsetPoint1, offsetPoint2, false);
       }
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
@@ -337,7 +354,7 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     }
 
     if (cPoint1.angle === 90 && cPoint2.angle === 90) {
-      add = goAroundRect2(rect2, offsetPoint1, offsetPoint2)
+      add = goAroundRect2ByX(rect2, offsetPoint1, offsetPoint2)
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
@@ -365,22 +382,22 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     }
 
     if (cPoint1.angle === 270 && cPoint2.angle === 0) {
-      add = goFromBottomToRight(rect1, offsetPoint1, offsetPoint2)
+      add = goAroundRect1ByXFrom270to0(rect1, offsetPoint1, offsetPoint2)
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
     if (cPoint1.angle === 270 && cPoint2.angle === 180) {
-      add = goFromBottomToLeft(rect1, offsetPoint1, offsetPoint2);
+      add = goAroundRect1ByXFrom270to180(rect1, offsetPoint1, offsetPoint2);
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
     if (cPoint1.angle === 270 && cPoint2.angle === 270) {
-      add = goAroundRect1X(rect1, offsetPoint1, offsetPoint2)
+      add = goAroundRect1ByX(rect1, offsetPoint1, offsetPoint2)
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
     if (cPoint1.angle === 270 && cPoint2.angle === 90) {
-      add = goAroundTwoRect(rect1, rect2, offsetPoint1, offsetPoint2)
+      add = goAroundTwoRectX(rect1, rect2, offsetPoint1, offsetPoint2)
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
@@ -409,7 +426,7 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
 
     if (cPoint1.angle === 0 && cPoint2.angle === 180) {
       if (offsetPoint1.x >= offsetPoint2.x) {
-        add = find2PointsInTheMiddleY(offsetPoint1, offsetPoint2);
+        add = findWayBetweenOppositeByX(rect1, offsetPoint1, offsetPoint2, false);
       } else {
         add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
       }
@@ -436,7 +453,7 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
       if (offsetPoint1.x >= offsetPoint2.x) {
         add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
       } else {
-        add = find2PointsInTheMiddleY(offsetPoint1, offsetPoint2);
+        add = findWayBetweenOppositeByX(rect1, offsetPoint1, offsetPoint2, true);
       }
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
@@ -451,22 +468,22 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     }
 
     if (cPoint1.angle === 90 && cPoint2.angle === 90) {
-      add = goAroundRect1X(rect1, offsetPoint1, offsetPoint2)
+      add = goAroundRect1ByX(rect1, offsetPoint1, offsetPoint2)
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
     if (cPoint1.angle === 90 && cPoint2.angle === 0) {
-      add = goFromBottomToRight(rect1, offsetPoint1, offsetPoint2)
+      add = goAroundRect1ByXFrom270to0(rect1, offsetPoint1, offsetPoint2)
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
     if (cPoint1.angle === 90 && cPoint2.angle === 180) {
-      add = goFromBottomToLeft(rect1, offsetPoint1, offsetPoint2);
+      add = goAroundRect1ByXFrom270to180(rect1, offsetPoint1, offsetPoint2);
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
     if (cPoint1.angle === 90 && cPoint2.angle === 270) {
-      add = goAroundTwoRect(rect1, rect2, offsetPoint1, offsetPoint2)
+      add = goAroundTwoRectX(rect1, rect2, offsetPoint1, offsetPoint2)
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
@@ -495,7 +512,7 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
 
     if (cPoint1.angle === 0 && cPoint2.angle === 180) {
       if (offsetPoint1.x >= offsetPoint2.x) {
-        add = find2PointsInTheMiddleY(offsetPoint1, offsetPoint2);
+        add = findWayBetweenOppositeByX(rect1, offsetPoint1, offsetPoint2, true);
       } else {
         add = addPoint1XPoint2Y(offsetPoint1, offsetPoint2);
       }
@@ -512,7 +529,7 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     }
 
     if (cPoint1.angle === 270 && cPoint2.angle === 270) {
-      add = goAroundRect2(rect2, offsetPoint1, offsetPoint2)
+      add = goAroundRect2ByX(rect2, offsetPoint1, offsetPoint2)
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
@@ -542,7 +559,7 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     }
 
     if (cPoint1.angle === 270 && cPoint2.angle === 180) {
-      add = goAroundRect2ByBottom(rect2, offsetPoint1, offsetPoint2)
+      add = goAroundRect2ByYBottom(rect2, offsetPoint1, offsetPoint2)
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
@@ -556,12 +573,12 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     }
 
     if (cPoint1.angle === 90 && cPoint2.angle === 180) {
-      add = goAroundRect2ByTop(rect2, offsetPoint1, offsetPoint2)
+      add = goAroundRect2ByYTop(rect2, offsetPoint1, offsetPoint2)
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
     if (cPoint1.angle === 180 && cPoint2.angle === 0) {
-      add = find2PointsInTheMiddleX(offsetPoint1, offsetPoint2);
+      add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
@@ -584,12 +601,12 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     }
 
     if (cPoint1.angle === 180 && cPoint2.angle === 180) {
-      add = goAroundRect2Y(rect2, offsetPoint1, offsetPoint2);
+      add = goAroundRect2ByY(rect2, offsetPoint1, offsetPoint2);
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
     if (cPoint1.angle === 0 && cPoint2.angle === 0) {
-      add = goAroundRect1Y(rect1, offsetPoint1, offsetPoint2);
+      add = goAroundRect1ByY(rect1, offsetPoint1, offsetPoint2);
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
@@ -605,6 +622,16 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
 
     if (cPoint1.angle === 0 && cPoint2.angle === 180) {
       add = goAroundTwoRectY(rect1, rect2, offsetPoint1, offsetPoint2)
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 90 && cPoint2.angle === 270) {
+      add = findWayBetweenOppositeByY(rect1, offsetPoint1, offsetPoint2, false);
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 270 && cPoint2.angle === 90) {
+      add = findWayBetweenOppositeByY(rect1, offsetPoint1, offsetPoint2, false);
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
   }
@@ -618,10 +645,6 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
   }
 
-  if (cPoint1.angle === 90 && cPoint2.angle === 270) {
-    add = find2PointsInTheMiddleX(offsetPoint1, offsetPoint2);
-    return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
-  }
 
   if (cPoint1.angle === 270 && cPoint2.angle === 270) {
     if (rect2.position.y + rect2.size.height / 2 + offset > offsetPoint1.y) {
@@ -632,14 +655,11 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
   }
 
-  if (cPoint1.angle === 270 && cPoint2.angle === 90) {
-    add = find2PointsInTheMiddleX(offsetPoint1, offsetPoint2);
-    return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
-  }
+
 
   if (cPoint1.point.x < cPoint2.point.x) {
     if (cPoint1.angle === 270 && cPoint2.angle === 0) {
-      add = goAroundRect2ByBottom(rect2, offsetPoint1, offsetPoint2)
+      add = goAroundRect2ByYBottom(rect2, offsetPoint1, offsetPoint2)
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
@@ -653,7 +673,7 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     }
 
     if (cPoint1.angle === 90 && cPoint2.angle === 0) {
-      add = goAroundRect2ByTop(rect2, offsetPoint1, offsetPoint2)
+      add = goAroundRect2ByYTop(rect2, offsetPoint1, offsetPoint2)
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
@@ -682,12 +702,12 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     }
 
     if (cPoint1.angle === 180 && cPoint2.angle === 180) {
-      add = goAroundRect1Y(rect1, offsetPoint1, offsetPoint2);
+      add = goAroundRect1ByY(rect1, offsetPoint1, offsetPoint2);
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
     if (cPoint1.angle === 0 && cPoint2.angle === 0) {
-      add = goAroundRect2Y(rect2, offsetPoint1, offsetPoint2);
+      add = goAroundRect2ByY(rect2, offsetPoint1, offsetPoint2);
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
 
@@ -710,7 +730,17 @@ export function dataConverter(rect1: Rect, cPoint1: ConnectionPoint, rect2: Rect
     }
 
     if (cPoint1.angle === 0 && cPoint2.angle === 180) {
-      add = find2PointsInTheMiddleX(offsetPoint1, offsetPoint2);
+      add = addPoint1YPoint2X(offsetPoint1, offsetPoint2);
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 90 && cPoint2.angle === 270) {
+      add = findWayBetweenOppositeByY(rect1, offsetPoint1, offsetPoint2, true);
+      return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
+    }
+
+    if (cPoint1.angle === 270 && cPoint2.angle === 90) {
+      add = findWayBetweenOppositeByY(rect1, offsetPoint1, offsetPoint2, true);
       return [cPoint1.point, offsetPoint1, ...add, offsetPoint2, cPoint2.point];
     }
   }
